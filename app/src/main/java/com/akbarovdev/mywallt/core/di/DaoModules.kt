@@ -1,6 +1,7 @@
 package com.akbarovdev.mywallt.core.di
 
 import com.akbarovdev.mywallt.core.database.WalletDatabase
+import com.akbarovdev.mywallt.features.wallet.data.local.BudgetDao
 import com.akbarovdev.mywallt.features.wallet.data.local.ExpanseDao
 import dagger.Module
 import dagger.Provides
@@ -13,7 +14,15 @@ import javax.inject.Singleton
 object DaoModules {
     @Provides
     @Singleton
-    fun providerExpanseDao(db: WalletDatabase): ExpanseDao {
+    fun provideExpanseDao(db: WalletDatabase): ExpanseDao {
         return db.expanseDao()
     }
+
+    @Provides
+    @Singleton
+    fun provideBudgetDao(db: WalletDatabase): BudgetDao {
+        return db.budgetDao()
+    }
+
+
 }

@@ -1,7 +1,10 @@
 package com.akbarovdev.mywallt.core.di
 
+import com.akbarovdev.mywallt.features.wallet.data.local.BudgetDao
 import com.akbarovdev.mywallt.features.wallet.data.local.ExpanseDao
+import com.akbarovdev.mywallt.features.wallet.data.repository.BudgetRepositoryIml
 import com.akbarovdev.mywallt.features.wallet.data.repository.ExpanseRepositoryIml
+import com.akbarovdev.mywallt.features.wallet.domain.repositories.BudgetRepository
 import com.akbarovdev.mywallt.features.wallet.domain.repositories.ExpanseRepository
 import dagger.Module
 import dagger.Provides
@@ -14,7 +17,13 @@ import javax.inject.Singleton
 object RepositoryModules {
     @Provides
     @Singleton
-    fun providerExpanseRepository(dao: ExpanseDao): ExpanseRepository {
+    fun provideExpanseRepository(dao: ExpanseDao): ExpanseRepository {
         return ExpanseRepositoryIml(dao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBudgetRepository(dao: BudgetDao): BudgetRepository {
+        return BudgetRepositoryIml(dao)
     }
 }

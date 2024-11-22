@@ -21,7 +21,9 @@ fun IconBtn(icon: @Composable () -> Unit, onClick: () -> Unit) {
     IconButton(
         modifier = Modifier.border(
             width = 1.dp, color = Color.Black, shape = CircleShape
-        ), onClick = onClick
+        ), onClick = {
+            onClick()
+        }
     ) {
         icon()
     }

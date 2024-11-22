@@ -94,6 +94,7 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     // Hilt End
 
+
 }
 kapt {
     correctErrorTypes = true
