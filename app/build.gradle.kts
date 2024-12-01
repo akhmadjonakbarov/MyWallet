@@ -94,6 +94,10 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     // Hilt End
 
+    // Navigation
+    val nav_version = "2.8.4"
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+
 
 }
 kapt {
