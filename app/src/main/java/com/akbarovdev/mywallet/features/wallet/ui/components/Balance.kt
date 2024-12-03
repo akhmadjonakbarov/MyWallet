@@ -64,7 +64,7 @@ fun Balance(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconBtn(onClick = {
+                    CircleButton(onClick = {
 
                     }, icon = {
                         Icon(
@@ -74,7 +74,7 @@ fun Balance(
                     Balance(
                         balance = if (budgetState.value.budget.remained > 0.0) budgetState.value.budget.remained else budgetState.value.budget.amount
                     )
-                    IconBtn(onClick = {}, icon = {
+                    CircleButton(onClick = {}, icon = {
                         Icon(
                             Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null
                         )

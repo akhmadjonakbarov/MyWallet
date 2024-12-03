@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun IconBtn(icon: @Composable () -> Unit, onClick: () -> Unit) {
+fun CircleButton(icon: @Composable () -> Unit, onClick: () -> Unit) {
     IconButton(
         modifier = Modifier.border(
             width = 1.dp, color = Color.Black, shape = CircleShape
@@ -28,7 +28,7 @@ fun IconBtn(icon: @Composable () -> Unit, onClick: () -> Unit) {
 @Preview
 @Composable
 fun PreviewIconBtn() {
-    IconBtn(icon = {
+    CircleButton(icon = {
         Icon(
             Icons.AutoMirrored.Default.KeyboardArrowLeft,
             contentDescription = null

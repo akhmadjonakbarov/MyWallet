@@ -54,7 +54,7 @@ fun BudgetDialog(
         AlertDialog(
             onDismissRequest = onDismiss,
             title = {
-                Text(text = if (false) "Edit Expense" else "Add Budget")
+                Text(text = "Add Budget")
             },
             text = {
                 Column {

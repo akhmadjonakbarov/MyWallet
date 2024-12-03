@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.akbarovdev.mywallet.features.budget.ui.view_model.BudgetViewModel
+import com.akbarovdev.mywallet.features.common.components.AlertTextBox
 import com.akbarovdev.mywallet.features.wallet.domain.models.ExpanseModel
 import com.akbarovdev.mywallet.features.wallet.ui.view_model.WalletViewModel
 import com.akbarovdev.mywallet.utils.DateFormatter
@@ -161,12 +161,9 @@ fun BudgetManager(
                     }
 
                     else -> {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text(
-                                "Chiqimlar mavjud emas!",
-                                style = MaterialTheme.typography.headlineMedium
-                            )
-                        }
+                        AlertTextBox(
+                            "Expanse does not exist"
+                        )
                     }
 
                 }
