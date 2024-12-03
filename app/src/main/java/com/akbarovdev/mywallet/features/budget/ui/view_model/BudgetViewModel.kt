@@ -11,7 +11,6 @@ import com.akbarovdev.mywallet.features.budget.domain.models.BudgetModel
 import com.akbarovdev.mywallet.features.budget.domain.repository.BudgetRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -34,7 +33,7 @@ class BudgetViewModel @Inject constructor(
     )
 
     private val _state = MutableStateFlow(BudgetState())
-    val state: StateFlow<BudgetState> = _state.asStateFlow()
+    val state = _state.asStateFlow()
 
     private val _isOpenDialog = mutableStateOf(false) // Tracks dialog state
     val isOpenDialog: State<Boolean> = _isOpenDialog
@@ -125,6 +124,14 @@ class BudgetViewModel @Inject constructor(
 
     fun handleError(e: Exception) {
         _state.update { it.copy(error = e.message) }
+    }
+
+    fun deleteBudget(budget: BudgetModel) {
+        viewModelScope.launch {
+            repository.delete(budget)
+            fetchBudgets()
+            closeDialog()
+        }
     }
 
 }

@@ -27,7 +27,8 @@ class WalletViewModel @Inject constructor(
     data class ExpanseState(
         val expanses: List<ExpanseModel> = emptyList(),
         val currentExpanse: ExpanseModel? = null,
-        val error: String? = null // Optional: Handle errors
+        val error: String? = null, // Optional: Handle errors
+        val isDeleted: Boolean = false,
     )
 
 
@@ -47,7 +48,7 @@ class WalletViewModel @Inject constructor(
     }
 
     private val _state = MutableStateFlow(ExpanseState())
-    val expanseState: StateFlow<ExpanseState> = _state.asStateFlow()
+    val state: StateFlow<ExpanseState> = _state.asStateFlow()
 
 
     fun addExpanse(expanse: ExpanseModel, onUpdate: (() -> Unit)? = null) {
@@ -83,6 +84,7 @@ class WalletViewModel @Inject constructor(
                 // Create and add the updated expense
                 val updatedExpense = expense.copy(budgetId = updatedBudget.id)
                 expanseRepository.addExpense(updatedExpense)
+
             }
         }
 
@@ -112,13 +114,14 @@ class WalletViewModel @Inject constructor(
 
                     // Delete the old expense
                     expanseRepository.deleteExpense(currentExpense)
-
+                    selectExpanse()
                     // Allocate the new expense
                     allocateExpense(expanse)
                 }
             } catch (e: Exception) {
                 handleError("Failed to update expense: ${e.message}")
             }
+
         }
     }
 
@@ -149,13 +152,35 @@ class WalletViewModel @Inject constructor(
 
     fun deleteExpanse(expanse: ExpanseModel) {
         viewModelScope.launch {
-            expanseRepository.deleteExpense(expanse)
+            try {
+                val budgets = budgetRepository.getBudgets().first()
+                val budget = budgets.first { it.id == expanse.budgetId }
+                val updatedBudget =
+                    budget.copy(
+                        remained = budget.remained + expanse.price * expanse.qty
+                    )
+                budgetRepository.update(updatedBudget)
+                expanseRepository.deleteExpense(expanse)
+                _state.update {
+                    it.copy(
+                        isDeleted = true
+                    )
+                }
+            } catch (e: Exception) {
+                handleError(e.message.toString())
+            } finally {
+                fetchExpanses()
+            }
         }
     }
 
-    fun selectExpanse(expanse: ExpanseModel) {
-        _state.update { it.copy(currentExpanse = expanse) }
-        openDialog()
+    fun selectExpanse(expanse: ExpanseModel? = null) {
+        viewModelScope.launch {
+            _state.update { it.copy(currentExpanse = expanse) }
+            if (expanse != null) {
+                openDialog()
+            }
+        }
     }
 
     fun handleError(e: String) {

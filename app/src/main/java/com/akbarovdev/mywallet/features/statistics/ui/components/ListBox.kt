@@ -51,7 +51,9 @@ fun ListBox(
                 val item = list[index]
                 ExpanseItem(
                     item, configuration = configuration,
-                    padding = 10.dp, onLongPress = {}
+                    padding = 10.dp, onLongPress = {}, onDelete = {
+
+                    }
                 )
             }
         }

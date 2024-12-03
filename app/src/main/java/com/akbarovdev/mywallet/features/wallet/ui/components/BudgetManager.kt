@@ -149,11 +149,12 @@ fun BudgetManager(
                 }
                 when {
                     expanses.isNotEmpty() -> {
-
                         ExpanseList(
                             expanses, configuration,
+                            onDelete = {
+                                walletViewModel.deleteExpanse(it)
+                            },
                             onLongPress = {
-
                                 walletViewModel.selectExpanse(it)
                             }
                         )

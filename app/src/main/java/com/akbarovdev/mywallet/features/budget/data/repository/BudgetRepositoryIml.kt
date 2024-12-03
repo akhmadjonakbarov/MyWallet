@@ -20,4 +20,9 @@ class BudgetRepositoryIml @Inject constructor(
     override suspend fun update(budget: BudgetModel) {
         dao.updateBudget(budget)
     }
+
+    override suspend fun delete(budget: BudgetModel) {
+        dao.deleteBudget(budget)
+    }
+
 }

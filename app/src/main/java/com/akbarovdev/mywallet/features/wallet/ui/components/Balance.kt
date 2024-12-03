@@ -40,7 +40,7 @@ fun Balance(
 ) {
 
     val budgetState = budgetViewModel.state.collectAsState()
-    val walletState = walletViewModel.expanseState.collectAsState()
+    val walletState = walletViewModel.state.collectAsState()
     Box(Modifier.fillMaxSize()) {
         Column(
             Modifier.fillMaxSize(),

@@ -13,4 +13,16 @@ data class BudgetModel(
     val amount: Double,
     val remained: Double = 0.0,
     val date: String
-)
+) {
+    companion object {
+        // Create a method that returns a default empty instance
+        fun empty(): BudgetModel {
+            return BudgetModel(
+                id = -1,
+                amount = 0.0,
+                remained = 0.0,
+                date = ""
+            )
+        }
+    }
+}

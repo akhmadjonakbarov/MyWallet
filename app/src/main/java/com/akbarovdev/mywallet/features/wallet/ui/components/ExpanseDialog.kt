@@ -66,19 +66,42 @@ fun ExpenseDialog(
     var qtyError by remember { mutableStateOf<String?>(null) }
     var priceError by remember { mutableStateOf<String?>(null) }
 
-
+    val outlinedIcons = setOf(
+        Icons.Outlined.Home,
+        Icons.Outlined.Fastfood,
+        Icons.Outlined.ShoppingBag,
+        Icons.Outlined.Book,
+        Icons.Outlined.Phone,
+        Icons.Outlined.Coffee,
+        Icons.Outlined.Settings,
+        Icons.Outlined.Favorite,
+        Icons.Outlined.AccountCircle,
+        Icons.Outlined.Mail,
+        Icons.Outlined.Phone,
+        Icons.Outlined.Info,
+        Icons.Outlined.Notifications,
+        Icons.Outlined.LocationOn,
+        Icons.Outlined.Search,
+        Icons.Outlined.Share,
+        Icons.Outlined.Security,
+        Icons.Outlined.Language,
+        Icons.Outlined.Lock,
+        Icons.Outlined.Brightness7
+        // Add more icons as needed
+    )
 
     if (isOpen) {
-
         var title by remember { mutableStateOf("") }
         var qty by remember { mutableStateOf("") }
         var price by remember { mutableStateOf("") }
-
+        var selectedIcon by remember { mutableStateOf(Icons.Outlined.Home) }
+        var selectedMeasure by remember { mutableStateOf("kg") }
 
         if (expanseModel != null) {
             title = expanseModel.title
             qty = expanseModel.qty.toString()
             price = expanseModel.price.toString()
+            selectedMeasure = expanseModel.measure.toString()
         }
 
         fun validateFields(): Boolean {
@@ -92,33 +115,9 @@ fun ExpenseDialog(
         }
 
 
-        val outlinedIcons = listOf(
-            Icons.Outlined.Home,
-            Icons.Outlined.Fastfood,
-            Icons.Outlined.ShoppingBag,
-            Icons.Outlined.Book,
-            Icons.Outlined.Phone,
-            Icons.Outlined.Coffee,
-            Icons.Outlined.Settings,
-            Icons.Outlined.Favorite,
-            Icons.Outlined.AccountCircle,
-            Icons.Outlined.Mail,
-            Icons.Outlined.Phone,
-            Icons.Outlined.Info,
-            Icons.Outlined.Notifications,
-            Icons.Outlined.LocationOn,
-            Icons.Outlined.Search,
-            Icons.Outlined.Share,
-            Icons.Outlined.Security,
-            Icons.Outlined.Language,
-            Icons.Outlined.Lock,
-            Icons.Outlined.Brightness7
-            // Add more icons as needed
-        )
 
 
-        var selectedIcon by remember { mutableStateOf(Icons.Outlined.Home) }
-        var selectedMeasure by remember { mutableStateOf("kg") }
+
         AlertDialog(
             onDismissRequest = onDismiss,
             title = {
@@ -131,7 +130,6 @@ fun ExpenseDialog(
                         value = title,
                         onValueChange = {
                             title = it
-
                             titleError = if (it.isEmpty()) "Title cannot be empty" else null
                         },
                         label = { Text("Title") },
@@ -227,7 +225,7 @@ fun ExpenseDialog(
                         if (validateFields()) {
                             onSave(
                                 ExpanseModel(
-                                    title = title,
+                                    title = title.lowercase(),
                                     qty = qty.toDouble(),
                                     price = price.toDouble(),
                                     date = LocalDateTime.now().toString(),
@@ -254,13 +252,13 @@ fun ExpenseDialog(
 
 @Composable
 fun IconPicker(
-    icons: List<ImageVector>, // List of icons to pick from
+    icons: Set<ImageVector>, // List of icons to pick from
     selectedIcon: ImageVector?, // Currently selected icon
     onIconSelected: (ImageVector) -> Unit // Callback for icon selection
 ) {
     LazyRow {
         items(icons.size) { icon ->
-            val icon = icons[icon]
+            val icon = icons.toList()[icon]
             Row {
                 Box(
                     modifier = Modifier

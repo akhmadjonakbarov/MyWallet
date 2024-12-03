@@ -7,4 +7,5 @@ interface BudgetRepository {
     suspend fun getBudgets(): Flow<List<BudgetModel>>
     suspend fun addBudget(budget: BudgetModel)
     suspend fun update(budget: BudgetModel)
+    suspend fun delete(budget: BudgetModel)
 }

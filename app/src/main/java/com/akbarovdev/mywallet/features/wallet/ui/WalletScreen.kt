@@ -49,7 +49,7 @@ fun WalletScreen(
     val snackBarHostState = remember { SnackbarHostState() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-    val walletState = walletViewModel.expanseState.collectAsState()
+    val walletState = walletViewModel.state.collectAsState()
     val budgetState = budgetViewModel.state.collectAsState()
 
 
@@ -67,6 +67,15 @@ fun WalletScreen(
                 thirdIsVisible.value = true
             }
         })
+
+        if (walletState.value.isDeleted) {
+            scope.launch {
+                snackBarHostState.showSnackbar(
+                    message = "Expanse was deleted successfully"
+                )
+            }
+
+        }
     }
 
     fun closeDrawer() {
@@ -118,18 +127,17 @@ fun WalletScreen(
 
             ExpenseDialog(isOpen = walletViewModel.isOpenDialog.value,
                 expanseModel = if (walletState.value.currentExpanse != null) walletState.value.currentExpanse else null,
-                onDismiss = { walletViewModel.closeDialog() },
+                onDismiss = {
+
+
+                    walletViewModel.selectExpanse()
+                    walletViewModel.closeDialog()
+
+                },
                 onSave = { expense ->
-                    val currentExpanse = walletState.value.currentExpanse
-                    if (currentExpanse != null) {
-                        val updatedExpanse = currentExpanse.copy(
-                            price = expense.price,
-                            title = expense.title,
-                            qty = expense.qty,
-                            measure = expense.measure,
-                            icon = expense.icon
-                        )
-                        walletViewModel.updateExpanse(updatedExpanse)
+                    if (walletState.value.currentExpanse != null) {
+                        walletViewModel.updateExpanse(expense)
+
                     } else {
                         walletViewModel.addExpanse(expense) {
                             budgetViewModel.fetchBudget()

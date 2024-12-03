@@ -1,23 +1,26 @@
 package com.akbarovdev.mywallet.features.budget.ui
 
 import android.annotation.SuppressLint
-import android.content.res.Configuration
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -25,36 +28,37 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.akbarovdev.mywallet.features.budget.domain.models.BudgetModel
-import com.akbarovdev.mywallet.features.common.components.AppBar
 import com.akbarovdev.mywallet.features.budget.ui.view_model.BudgetViewModel
+import com.akbarovdev.mywallet.features.common.components.AppBar
 import com.akbarovdev.mywallet.utils.DateFormatter
 import com.akbarovdev.mywallet.utils.NumberFormat
-import com.akbarovdev.mywallet.utils.managers.IconManager
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("NewApi")
 @Composable
 fun BudgetScreen(
     navController: NavController,
     budgetViewModel: BudgetViewModel = hiltViewModel<BudgetViewModel>()
 ) {
 
-    val configuration = LocalConfiguration.current
     val state = budgetViewModel.state.collectAsState()
+    val budget = remember { mutableStateOf(BudgetModel.empty()) }
     Scaffold(topBar = {
         AppBar(
             title = "Budget Manager", navController = navController
@@ -89,9 +93,10 @@ fun BudgetScreen(
                         }
                         items(state.value.list.size) { index ->
                             val item = state.value.list[index]
-                            BudgetItem(
-                                item, configuration = configuration
-                            )
+                            BudgetItem(item, onDelete = {
+                                budget.value = item
+                                budgetViewModel.openDialog()
+                            })
                         }
                     }
                 }
@@ -106,13 +111,48 @@ fun BudgetScreen(
             }
         }
     }
+
+    if (budgetViewModel.isOpenDialog.value) {
+        AlertDialog(
+            title = {
+                Text(
+                    "${NumberFormat.format(budget.value.amount)} so'm",
+                )
+            },
+            text = {
+                Text("Do you want to delete?")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        budgetViewModel.deleteBudget(budget.value)
+                    }, colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red
+                    )
+                ) {
+                    Icon(Icons.Outlined.Delete, contentDescription = "Delete")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        budgetViewModel.closeDialog()
+                        budget.value = BudgetModel.empty()
+                    }
+                ) {
+                    Icon(Icons.Outlined.Close, contentDescription = "Delete")
+                }
+            },
+            onDismissRequest = { budgetViewModel.closeDialog() },
+        )
+    }
 }
 
 
 @SuppressLint("NewApi")
 @Composable
-fun BudgetItem(
-    budget: BudgetModel, configuration: Configuration, padding: Dp = 20.dp
+private fun BudgetItem(
+    budget: BudgetModel, padding: Dp = 20.dp, onDelete: () -> Unit
 ) {
     // State for alpha animation
     val alphaAnimation = remember { Animatable(0f) }
@@ -136,6 +176,9 @@ fun BudgetItem(
 
     Box(modifier = Modifier
         .fillMaxWidth()
+        .pointerInput(Unit) {
+            detectTapGestures(onTap = { onDelete() })
+        }
         .graphicsLayer {
             alpha = alphaAnimation.value
         }

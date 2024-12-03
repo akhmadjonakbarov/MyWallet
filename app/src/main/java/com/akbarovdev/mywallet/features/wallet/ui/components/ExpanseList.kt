@@ -17,11 +17,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -39,22 +43,29 @@ import com.akbarovdev.mywallet.utils.NumberFormat
 import com.akbarovdev.mywallet.utils.managers.IconManager
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import java.util.Locale
 
 @SuppressLint("NewApi")
 @Composable
 fun ExpanseList(
     expanses: List<ExpanseModel>, configuration: Configuration, onLongPress: (
         ExpanseModel
-    ) -> Unit
+    ) -> Unit, onDelete: (ExpanseModel) -> Unit
 ) {
 
     LazyColumn {
 
         items(count = expanses.count()) { index ->
             val expanse: ExpanseModel = expanses[index]
-            ExpanseItem(expanse, configuration) {
-                onLongPress(it)
-            }
+            ExpanseItem(
+                expanse = expanse,
+                configuration = configuration,
+                onDelete = {
+                    onDelete(it)
+                }, onLongPress = {
+                    onLongPress(it)
+                }
+            )
         }
     }
 
@@ -68,12 +79,14 @@ fun ExpanseItem(
     expanse: ExpanseModel,
     configuration: Configuration,
     padding: Dp = 20.dp,
-    onLongPress: ((ExpanseModel) -> Unit)? = null
+    onLongPress: ((ExpanseModel) -> Unit)? = null, onDelete: (ExpanseModel) -> Unit
 ) {
     // State for alpha animation
     val alphaAnimation = remember { Animatable(0f) }
-
     val scope = rememberCoroutineScope()
+
+    var isSelected = remember { mutableStateOf(false) }
+
 
     LaunchedEffect(Unit) {
         // Start the fade-in animation when the composable is launched
@@ -95,48 +108,59 @@ fun ExpanseItem(
         .pointerInput(Unit) {
             detectTapGestures(onLongPress = {
                 onLongPress?.invoke(expanse)
+            }, onDoubleTap = {
+                isSelected.value = !isSelected.value
             })
         }
         .graphicsLayer {
             alpha = alphaAnimation.value
         }
-        .padding(padding)) {
-        Row(
-            Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .clip(shape = CircleShape)
-                        .background(color = Color.LightGray)
+        .padding(padding), contentAlignment = Alignment.Center) {
 
-                        .padding(8.dp)
-                ) {
-                    Icon(IconManager.iconByName(expanse.icon), contentDescription = null)
+        if (isSelected.value) {
+            Button(onClick = {
+                onDelete(expanse)
+            }) {
+                Icon(Icons.Outlined.Delete, contentDescription = "Delete")
+            }
+        } else {
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .clip(shape = CircleShape)
+                            .background(color = Color.LightGray)
+
+                            .padding(8.dp)
+                    ) {
+                        Icon(IconManager.iconByName(expanse.icon), contentDescription = null)
+                    }
+                    Spacer(Modifier.width((configuration.screenWidthDp / 40).dp))
+                    Column {
+                        Text(
+                            expanse.title.capitalize(Locale.ROOT),
+                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                        )
+                        Text(
+                            DateFormatter.formatWithDayHour(LocalDateTime.parse(expanse.date)),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
                 }
-                Spacer(Modifier.width((configuration.screenWidthDp / 40).dp))
                 Column {
                     Text(
-                        expanse.title,
-                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                        "${NumberFormat.format(expanse.price * expanse.qty)} so'm",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.W700)
                     )
                     Text(
-                        DateFormatter.formatWithDayHour(LocalDateTime.parse(expanse.date)),
-                        style = MaterialTheme.typography.labelLarge
+                        "${expanse.qty} ${expanse.measure}",
+                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.W700)
                     )
                 }
-            }
-            Column {
-                Text(
-                    "${NumberFormat.format(expanse.price * expanse.qty)} so'm",
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.W700)
-                )
-                Text(
-                    "${expanse.qty} ${expanse.measure}",
-                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.W700)
-                )
             }
         }
     }
