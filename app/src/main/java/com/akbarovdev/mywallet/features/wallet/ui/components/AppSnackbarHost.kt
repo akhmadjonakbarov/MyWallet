@@ -1,5 +1,6 @@
 package com.akbarovdev.mywallet.features.wallet.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,13 +19,15 @@ import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AppSnackBarHostState(snackBarHostState: SnackbarHostState, snackBarColor: Color?) {
+fun AppSnackBarHostState(snackBarHostState: SnackbarHostState, snackBarColor: Color = Color.Red) {
     Box(
         modifier = Modifier
             .fillMaxSize()
+
             .padding(15.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
@@ -33,6 +36,7 @@ fun AppSnackBarHostState(snackBarHostState: SnackbarHostState, snackBarColor: Co
             hostState = snackBarHostState,
             snackbar = { snackBarData ->
                 Snackbar(
+                    containerColor = snackBarColor,
                     action = {
                         Button(
                             colors = ButtonDefaults.buttonColors(
@@ -51,7 +55,7 @@ fun AppSnackBarHostState(snackBarHostState: SnackbarHostState, snackBarColor: Co
                 ) {
                     Text(
                         snackBarData.visuals.message,
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.W500)
                     )
                 }
             }

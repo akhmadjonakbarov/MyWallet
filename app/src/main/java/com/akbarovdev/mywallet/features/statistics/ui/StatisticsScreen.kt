@@ -1,35 +1,25 @@
 package com.akbarovdev.mywallet.features.statistics.ui
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.akbarovdev.mywallet.features.common.components.AlertTextBox
 import com.akbarovdev.mywallet.features.common.components.AppBar
 import com.akbarovdev.mywallet.features.statistics.ui.components.BarChart
 import com.akbarovdev.mywallet.features.statistics.ui.components.ListBox
@@ -46,7 +36,7 @@ fun StatisticsScreen(
 
     val configuration = LocalConfiguration.current
     val state = statisticViewModel.state.collectAsState()
-
+    val context = LocalContext.current
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -68,35 +58,36 @@ fun StatisticsScreen(
                 }
 
                 state.value.charts.isNotEmpty() -> {
-                    LazyColumn {
-                        item {
-                            BarChart(
-                                charts = state.value.charts,
-                                height = (configuration.screenHeightDp * 0.3),
-                            )
+                    when {
+                        state.value.charts.size > 2 -> {
+                            LazyColumn {
+                                item {
+                                    BarChart(
+                                        charts = state.value.charts,
+                                        height = (configuration.screenHeightDp * 0.3),
+                                    )
+                                }
+                                items(state.value.statistics.count()) { index ->
+                                    val item = state.value.statistics[index]
+                                    ListBox(
+                                        list = item.list,
+                                        label = item.label,
+                                        height = configuration.screenHeightDp * 0.4,
+                                        labelFontSize = configuration.screenWidthDp * 0.05
+                                    )
+                                }
+                            }
                         }
-                        items(state.value.statistics.count()) { index ->
-                            val item = state.value.statistics[index]
-                            ListBox(
-                                list = item.list,
-                                label = item.label,
-                                height = configuration.screenHeightDp * 0.4,
-                                labelFontSize = configuration.screenWidthDp * 0.05
-                            )
+
+                        else -> {
+                            AlertTextBox("Data is not enough for generating statistics!")
+
                         }
                     }
                 }
 
                 else -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center // Centers the content in the Box
-                    ) {
-                        Text(
-                            "No Statistics",
-                            style = MaterialTheme.typography.headlineSmall
-                        )
-                    }
+                    AlertTextBox("Statistics does not exist")
                 }
             }
         }

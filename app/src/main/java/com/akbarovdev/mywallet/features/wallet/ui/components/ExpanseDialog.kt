@@ -72,8 +72,13 @@ fun ExpenseDialog(
 
         var title by remember { mutableStateOf("") }
         var qty by remember { mutableStateOf("") }
-        var price by remember {
-            mutableStateOf("")
+        var price by remember { mutableStateOf("") }
+
+
+        if (expanseModel != null) {
+            title = expanseModel.title
+            qty = expanseModel.qty.toString()
+            price = expanseModel.price.toString()
         }
 
         fun validateFields(): Boolean {
@@ -84,15 +89,6 @@ fun ExpenseDialog(
                 if (price.isEmpty() || price.toDoubleOrNull() == null) "Price must be a valid number" else null
 
             return titleError == null && qtyError == null && priceError == null
-        }
-
-
-
-
-        if (expanseModel != null) {
-            title = expanseModel.title
-            qty = expanseModel.qty.toString()
-            price = expanseModel.price.toString()
         }
 
 
@@ -112,7 +108,6 @@ fun ExpenseDialog(
             Icons.Outlined.Notifications,
             Icons.Outlined.LocationOn,
             Icons.Outlined.Search,
-            Icons.Outlined.Help,
             Icons.Outlined.Share,
             Icons.Outlined.Security,
             Icons.Outlined.Language,

@@ -3,6 +3,7 @@ package com.akbarovdev.mywallet.features.common.components
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,5 +38,21 @@ fun AppBar(
                 )
             )
         }
+    )
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeAppBar(modifier: Modifier = Modifier, onClick: () -> Unit) {
+    TopAppBar(
+        title = { Text(text = "Wallet") },
+        navigationIcon = {
+            IconButton(onClick = {
+                onClick()
+            }) {
+                Icon(Icons.Default.Menu, contentDescription = "Open Drawer")
+            }
+        },
     )
 }

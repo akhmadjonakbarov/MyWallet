@@ -1,13 +1,14 @@
 package com.akbarovdev.mywallet.features.wallet.ui.view_model
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.akbarovdev.mywallet.features.budget.domain.models.BudgetModel
-import com.akbarovdev.mywallet.features.wallet.domain.models.ExpanseModel
 import com.akbarovdev.mywallet.features.budget.domain.repository.BudgetRepository
+import com.akbarovdev.mywallet.features.wallet.domain.models.ExpanseModel
 import com.akbarovdev.mywallet.features.wallet.domain.repositories.ExpanseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,58 +46,80 @@ class WalletViewModel @Inject constructor(
         _isOpenDialog.value = false
     }
 
-    private val _expanseState = MutableStateFlow(ExpanseState())
-    val expanseState: StateFlow<ExpanseState> = _expanseState.asStateFlow()
+    private val _state = MutableStateFlow(ExpanseState())
+    val expanseState: StateFlow<ExpanseState> = _state.asStateFlow()
 
-    init {
-        fetchExpanses()
-    }
 
     fun addExpanse(expanse: ExpanseModel, onUpdate: (() -> Unit)? = null) {
         viewModelScope.launch {
             try {
-                // Add expanse to the repository
-                expanseRepository.addExpense(expanse)
-
-                allocateExpense(expanse.qty * expanse.price)
-
+                allocateExpense(expanse)
             } catch (e: Exception) {
-                _expanseState.update { it.copy(error = "Failed to add expense: ${e.message}") }
+                _state.update { it.copy(error = "Failed to add expense: ${e.message}") }
             }
 
-            fetchExpanses()
-
-            // Call the optional update callback
             onUpdate?.invoke()
         }
     }
 
-    suspend fun allocateExpense(expenseAmount: Double) {
-        var remainingExpense = expenseAmount
+    suspend fun allocateExpense(expense: ExpanseModel) {
+        var remainingExpense = expense.price * expense.qty
 
-        // Get budgets sorted by creation date (latest first)
-        budgetRepository.getBudgets().collect { budgets ->
+        // Fetch budgets in a background-friendly manner
+        val budgets = budgetRepository.getBudgets().first()
 
+        budgets.forEach { budget ->
+            if (remainingExpense <= 0) return@forEach
 
-            for (budget in budgets) {
-                if (remainingExpense <= 0) {
-                    throw IllegalStateException("Insufficient budget")
-                }
+            // Calculate the deduction from the budget
+            val deduction = minOf(remainingExpense, budget.remained)
+            remainingExpense -= deduction
 
-                val deduction = minOf(remainingExpense, budget.remained)
-                remainingExpense -= deduction
-
+            if (deduction > 0) {
+                // Only update the budget if there is a change in the remaining amount
                 val updatedBudget = budget.copy(remained = budget.remained - deduction)
                 budgetRepository.update(updatedBudget)
-            }
 
-            if (remainingExpense > 0) {
-                throw IllegalStateException("Insufficient budget to cover the expense!")
+                // Create and add the updated expense
+                val updatedExpense = expense.copy(budgetId = updatedBudget.id)
+                expanseRepository.addExpense(updatedExpense)
             }
-
         }
 
+        // If there’s remaining expense, throw an exception
+        if (remainingExpense > 0) {
+            throw IllegalStateException(
+                "Insufficient budget to cover the expense of ${expense.price * expense.qty}. Remaining: $remainingExpense"
+            )
+        }
+    }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateExpanse(expanse: ExpanseModel) {
+        viewModelScope.launch {
+            try {
+                val currentExpense = _state.value.currentExpanse
+
+                if (currentExpense != null) {
+                    val currentTotal = currentExpense.qty * currentExpense.price
+                    val budgets = budgetRepository.getBudgets().first()
+
+                    // Adjust the current budget if the expense was updated
+                    budgets.find { it.id == currentExpense.budgetId }?.let { budget ->
+                        val updatedBudget = budget.copy(remained = budget.remained + currentTotal)
+                        budgetRepository.update(updatedBudget)
+                    }
+
+                    // Delete the old expense
+                    expanseRepository.deleteExpense(currentExpense)
+
+                    // Allocate the new expense
+                    allocateExpense(expanse)
+                }
+            } catch (e: Exception) {
+                handleError("Failed to update expense: ${e.message}")
+            }
+        }
     }
 
 
@@ -104,20 +127,25 @@ class WalletViewModel @Inject constructor(
     fun fetchExpanses() {
         viewModelScope.launch {
             try {
-                expanseRepository.getExpenses().collect { expanses ->
-                    val filteredExpanses = expanses.filter {
-                        val expanseDate = LocalDateTime.parse(it.date)
+                expanseRepository.getExpenses().collect { expenses ->
+                    val filteredExpanses = expenses.filter { expense ->
+                        val expanseDate = LocalDateTime.parse(expense.date)
                         expanseDate.year == _selectedDate.value.year && expanseDate.month == _selectedDate.value.month && expanseDate.dayOfMonth == _selectedDate.value.dayOfMonth
                     }
-                    _expanseState.update {
-                        it.copy(expanses = filteredExpanses, error = null) // Clear previous errors
+
+                    // Update the state with filtered expenses
+                    _state.update {
+                        it.copy(
+                            expanses = filteredExpanses, error = null
+                        ) // Clear any previous errors
                     }
                 }
             } catch (e: Exception) {
-                _expanseState.update { it.copy(error = "Failed to fetch expenses: ${e.message}") }
+                _state.update { it.copy(error = "Failed to fetch expenses: ${e.message}") }
             }
         }
     }
+
 
     fun deleteExpanse(expanse: ExpanseModel) {
         viewModelScope.launch {
@@ -126,7 +154,12 @@ class WalletViewModel @Inject constructor(
     }
 
     fun selectExpanse(expanse: ExpanseModel) {
-        _expanseState.update { it.copy(currentExpanse = expanse) }
+        _state.update { it.copy(currentExpanse = expanse) }
+        openDialog()
+    }
+
+    fun handleError(e: String) {
+        _state.update { it.copy(error = e) }
     }
 
     fun setDate(time: LocalDateTime) {

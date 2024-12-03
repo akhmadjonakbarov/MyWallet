@@ -30,8 +30,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.akbarovdev.mywallet.features.wallet.domain.models.ExpanseModel
 import com.akbarovdev.mywallet.features.budget.ui.view_model.BudgetViewModel
+import com.akbarovdev.mywallet.features.wallet.domain.models.ExpanseModel
 import com.akbarovdev.mywallet.features.wallet.ui.view_model.WalletViewModel
 import com.akbarovdev.mywallet.utils.DateFormatter
 import com.akbarovdev.mywallet.utils.NumberFormat
@@ -124,8 +124,6 @@ fun BudgetManager(
                                 .padding(5.dp),
                         ) {
                             Text(
-
-
                                 text = "Expenses",
                                 style = MaterialTheme.typography.headlineSmall.copy(
                                     fontWeight = FontWeight.Bold,
@@ -152,8 +150,13 @@ fun BudgetManager(
                 when {
                     expanses.isNotEmpty() -> {
 
+                        ExpanseList(
+                            expanses, configuration,
+                            onLongPress = {
 
-                        ExpanseList(expanses, configuration)
+                                walletViewModel.selectExpanse(it)
+                            }
+                        )
                     }
 
                     else -> {

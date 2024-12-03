@@ -1,55 +1,39 @@
 package com.akbarovdev.mywallet.features.wallet.ui
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.AttachMoney
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.PieChart
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.akbarovdev.mywallet.core.navigation.Screens
 import com.akbarovdev.mywallet.features.budget.ui.view_model.BudgetViewModel
+import com.akbarovdev.mywallet.features.common.components.HomeAppBar
 import com.akbarovdev.mywallet.features.wallet.ui.components.AppSnackBarHostState
 import com.akbarovdev.mywallet.features.wallet.ui.components.Balance
 import com.akbarovdev.mywallet.features.wallet.ui.components.ExpenseDialog
+import com.akbarovdev.mywallet.features.wallet.ui.components.FloatButton
+import com.akbarovdev.mywallet.features.wallet.ui.components.MenuDrawer
 import com.akbarovdev.mywallet.features.wallet.ui.view_model.WalletViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @SuppressLint("NewApi")
@@ -66,11 +50,23 @@ fun WalletScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     val walletState = walletViewModel.expanseState.collectAsState()
+    val budgetState = budgetViewModel.state.collectAsState()
 
+
+    // float action button animation
+    val thirdIsVisible = remember { mutableStateOf(false) }
+    val scale = animateFloatAsState(
+        targetValue = if (thirdIsVisible.value) 1f else 0f, // Scale from half-size to full-size
+        animationSpec = tween(durationMillis = (1000)), label = "float action button animation"
+    )
 
     LaunchedEffect(Unit) {
         walletViewModel.fetchExpanses()
-        budgetViewModel.fetchBudget()
+        budgetViewModel.fetchBudget(onUpdate = {
+            scope.launch {
+                thirdIsVisible.value = true
+            }
+        })
     }
 
     fun closeDrawer() {
@@ -79,91 +75,61 @@ fun WalletScreen(
         }
     }
 
-    ModalNavigationDrawer(
-        gesturesEnabled = true,
+    ModalNavigationDrawer(gesturesEnabled = true,
 
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet(
-                modifier = Modifier
-                    .width((configuration.screenWidthDp * 0.6).dp)
-                    .fillMaxHeight(),
-            ) {
-                Text(
-                    "Menu",
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                HorizontalDivider()
-                NavigationDrawerItem(
-                    shape = RectangleShape,
-                    label = {
-                        MenuItemText("Statistics", Icons.Default.PieChart)
-                    },
-                    selected = false,
-                    onClick = {
-                        navController.navigate(Screens.statistics)
-                        closeDrawer()
-                    }
-                )
-                NavigationDrawerItem(
-                    shape = RectangleShape,
-                    label = {
-                        MenuItemText("Budgets", Icons.Default.AttachMoney)
-                    },
-                    selected = false,
-                    onClick = {
-                        navController.navigate(Screens.budget)
-                        closeDrawer()
-                    }
-                )
-
-                NavigationDrawerItem(
-                    shape = RectangleShape,
-                    label = {
-                        MenuItemText("Currency", Icons.Default.Settings)
-                    },
-                    selected = false,
-                    onClick = { /*TODO*/ }
-                )
-            }
-        }
-    ) {
+        drawerState = drawerState, drawerContent = {
+            MenuDrawer(configuration, navController) { closeDrawer() }
+        }) {
 
         Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-            TopAppBar(title = { Text(text = "Wallet") }, navigationIcon = {
-                IconButton(onClick = {
-                    scope.launch {
-                        drawerState.open()  // Open drawer when navigation icon is clicked
-                    }
-                }) {
-                    Icon(Icons.Default.Menu, contentDescription = "Open Drawer")
+            HomeAppBar {
+                scope.launch {
+                    drawerState.open()  // Open drawer when navigation icon is clicked
                 }
-            })
+            }
         },
 
             floatingActionButton = {
-                SmallFloatingActionButton(
-                    onClick = {
+                if (budgetState.value.lastAddedBudgetValue > 0.0) {
+                    FloatButton(
+                        modifier = Modifier.graphicsLayer {
+                            scaleX = scale.value
+                            scaleY = scale.value
+                        },
+                    ) {
                         walletViewModel.openDialog()
-                    }, containerColor = Color.Blue
-                ) {
-                    Icon(Icons.Default.AddCircle, contentDescription = null, tint = Color.White)
+                    }
                 }
+
             }) { innerPadding ->
             Box(
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()
             ) {
-                Balance(walletViewModel, budgetViewModel, configuration)
+                Balance(walletViewModel, budgetViewModel, configuration, onClick = {
+
+                    scope.launch {
+                        delay(500)
+                        thirdIsVisible.value = true
+                    }
+                })
             }
 
             ExpenseDialog(isOpen = walletViewModel.isOpenDialog.value,
+                expanseModel = if (walletState.value.currentExpanse != null) walletState.value.currentExpanse else null,
                 onDismiss = { walletViewModel.closeDialog() },
                 onSave = { expense ->
-                    if (walletState.value.currentExpanse != null) {
-                        // Handle Edit Logic
+                    val currentExpanse = walletState.value.currentExpanse
+                    if (currentExpanse != null) {
+                        val updatedExpanse = currentExpanse.copy(
+                            price = expense.price,
+                            title = expense.title,
+                            qty = expense.qty,
+                            measure = expense.measure,
+                            icon = expense.icon
+                        )
+                        walletViewModel.updateExpanse(updatedExpanse)
                     } else {
                         walletViewModel.addExpanse(expense) {
                             budgetViewModel.fetchBudget()
@@ -171,25 +137,14 @@ fun WalletScreen(
                         scope.launch {
                             snackBarHostState.showSnackbar("Expanses has been added")
                         }
-
                     }
-
                 }
             )
 
         }
         AppSnackBarHostState(
-            snackBarHostState = snackBarHostState, snackBarColor = null,
+            snackBarHostState = snackBarHostState,
         )
-    }
-}
-
-@Composable
-fun MenuItemText(text: String, icon: ImageVector) {
-    Row {
-        Icon(icon, contentDescription = null)
-        Spacer(Modifier.width(5.dp))
-        Text(text = text)
     }
 }
 

@@ -3,10 +3,10 @@ package com.akbarovdev.mywallet.features.wallet.ui.components
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.animation.core.Animatable
-
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,29 +29,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.akbarovdev.mywallet.features.wallet.domain.models.ExpanseModel
 import com.akbarovdev.mywallet.utils.DateFormatter
-import com.akbarovdev.mywallet.utils.managers.IconManager
 import com.akbarovdev.mywallet.utils.NumberFormat
+import com.akbarovdev.mywallet.utils.managers.IconManager
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 @SuppressLint("NewApi")
 @Composable
 fun ExpanseList(
-    expanses: List<ExpanseModel>,
-    configuration: Configuration
+    expanses: List<ExpanseModel>, configuration: Configuration, onLongPress: (
+        ExpanseModel
+    ) -> Unit
 ) {
-
 
     LazyColumn {
 
         items(count = expanses.count()) { index ->
             val expanse: ExpanseModel = expanses[index]
-            ExpanseItem(expanse, configuration)
+            ExpanseItem(expanse, configuration) {
+                onLongPress(it)
+            }
         }
     }
 
@@ -64,7 +67,8 @@ fun ExpanseList(
 fun ExpanseItem(
     expanse: ExpanseModel,
     configuration: Configuration,
-    padding: Dp = 20.dp
+    padding: Dp = 20.dp,
+    onLongPress: ((ExpanseModel) -> Unit)? = null
 ) {
     // State for alpha animation
     val alphaAnimation = remember { Animatable(0f) }
@@ -75,8 +79,7 @@ fun ExpanseItem(
         // Start the fade-in animation when the composable is launched
         scope.launch {
             alphaAnimation.animateTo(
-                targetValue = 1f,
-                animationSpec = tween(
+                targetValue = 1f, animationSpec = tween(
                     durationMillis = 1250,  // Duration of the fade-in effect
                     delayMillis = 250,      // Delay before animation starts
                     easing = LinearEasing   // Easing function for smooth transition
@@ -87,14 +90,17 @@ fun ExpanseItem(
 
 
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .graphicsLayer {
-                alpha = alphaAnimation.value
-            }
-            .padding(padding)
-    ) {
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .pointerInput(Unit) {
+            detectTapGestures(onLongPress = {
+                onLongPress?.invoke(expanse)
+            })
+        }
+        .graphicsLayer {
+            alpha = alphaAnimation.value
+        }
+        .padding(padding)) {
         Row(
             Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,

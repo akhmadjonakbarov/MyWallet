@@ -5,5 +5,5 @@ object Screens {
     const val statistics = "statistics"
     const val currencyManager = "currencyManager"
     const val budget = "budget"
-
+    const val splash = "splash"
 }

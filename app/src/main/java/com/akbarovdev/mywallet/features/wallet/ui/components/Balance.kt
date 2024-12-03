@@ -36,6 +36,7 @@ fun Balance(
     walletViewModel: WalletViewModel,
     budgetViewModel: BudgetViewModel,
     configuration: Configuration,
+    onClick: () -> Unit
 ) {
 
     val budgetState = budgetViewModel.state.collectAsState()
@@ -70,7 +71,7 @@ fun Balance(
                             Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = null
                         )
                     })
-                    _Balance(
+                    Balance(
                         balance = if (budgetState.value.budget.remained > 0.0) budgetState.value.budget.remained else budgetState.value.budget.amount
                     )
                     IconBtn(onClick = {}, icon = {
@@ -92,10 +93,10 @@ fun Balance(
                 }
             )
         }
-
     }
     BudgetDialog(isOpen = budgetViewModel.isOpenDialog.value, onDismiss = {
         budgetViewModel.closeDialog()
+        onClick()
     }, onSave = { it ->
         budgetViewModel.addBudget(it)
     })
@@ -104,7 +105,7 @@ fun Balance(
 
 
 @Composable
-fun _Balance(balance: Double) {
+private fun Balance(balance: Double) {
 
     Column(
         horizontalAlignment = Alignment.End

@@ -54,7 +54,7 @@ class BudgetViewModel @Inject constructor(
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun fetchBudget() {
+    fun fetchBudget(onUpdate: (() -> Unit)? = null) {
         viewModelScope.launch {
 
             repository.getBudgets().collect { budgets ->
@@ -89,9 +89,11 @@ class BudgetViewModel @Inject constructor(
                             lastAddedBudgetValue = budgets.first().amount
                         )
                     }
+                    onUpdate?.invoke()
                 }
             }
         }
+
     }
 
 
