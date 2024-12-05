@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.akbarovdev.mywallet.core.navigation.Screens
+import com.akbarovdev.mywallet.core.navigation.SettingScreen
 
 @Composable
 fun MenuDrawer(
@@ -55,8 +56,8 @@ fun MenuDrawer(
         })
 
         NavigationDrawerItem(shape = RectangleShape, label = {
-            MenuItemText("Currency", Icons.Default.Settings)
-        }, selected = false, onClick = { /*TODO*/ })
+            MenuItemText("Settings", Icons.Default.Settings)
+        }, selected = false, onClick = { navController.navigate(SettingScreen.home) })
     }
 }
 

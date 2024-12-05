@@ -48,7 +48,7 @@ import java.util.Locale
 @SuppressLint("NewApi")
 @Composable
 fun ExpanseList(
-    expanses: List<ExpanseModel>, configuration: Configuration, onLongPress: (
+    expanses: List<ExpanseModel>, configuration: Configuration, currencyType: String, onLongPress: (
         ExpanseModel
     ) -> Unit, onDelete: (ExpanseModel) -> Unit
 ) {
@@ -60,6 +60,7 @@ fun ExpanseList(
             ExpanseItem(
                 expanse = expanse,
                 configuration = configuration,
+                currencyType = currencyType,
                 onDelete = {
                     onDelete(it)
                 }, onLongPress = {
@@ -77,6 +78,7 @@ fun ExpanseList(
 @Composable
 fun ExpanseItem(
     expanse: ExpanseModel,
+    currencyType: String,
     configuration: Configuration,
     padding: Dp = 20.dp,
     onLongPress: ((ExpanseModel) -> Unit)? = null, onDelete: (ExpanseModel) -> Unit
@@ -153,7 +155,7 @@ fun ExpanseItem(
                 }
                 Column {
                     Text(
-                        "${NumberFormat.format(expanse.price * expanse.qty)} so'm",
+                        "${NumberFormat.format(expanse.price * expanse.qty)} ${currencyType.lowercase()}",
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.W700)
                     )
                     Text(

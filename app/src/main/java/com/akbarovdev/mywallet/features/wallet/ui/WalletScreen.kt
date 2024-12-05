@@ -27,6 +27,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.akbarovdev.mywallet.features.budget.ui.view_model.BudgetViewModel
 import com.akbarovdev.mywallet.features.common.components.HomeAppBar
+import com.akbarovdev.mywallet.features.currency.ui.view_model.CurrencyManagerViewModel
 import com.akbarovdev.mywallet.features.wallet.ui.components.AppSnackBarHostState
 import com.akbarovdev.mywallet.features.wallet.ui.components.Balance
 import com.akbarovdev.mywallet.features.wallet.ui.components.ExpenseDialog
@@ -42,7 +43,8 @@ import kotlinx.coroutines.launch
 fun WalletScreen(
     navController: NavController,
     walletViewModel: WalletViewModel = hiltViewModel<WalletViewModel>(),
-    budgetViewModel: BudgetViewModel = hiltViewModel<BudgetViewModel>()
+    budgetViewModel: BudgetViewModel = hiltViewModel<BudgetViewModel>(),
+    currencyManagerViewModel: CurrencyManagerViewModel = hiltViewModel<CurrencyManagerViewModel>()
 ) {
     val configuration = LocalConfiguration.current
     val scope = rememberCoroutineScope()
@@ -51,7 +53,7 @@ fun WalletScreen(
 
     val walletState = walletViewModel.state.collectAsState()
     val budgetState = budgetViewModel.state.collectAsState()
-
+    val currencyManagerState = currencyManagerViewModel.state.collectAsState()
 
     // float action button animation
     val thirdIsVisible = remember { mutableStateOf(false) }
@@ -116,13 +118,17 @@ fun WalletScreen(
                     .padding(innerPadding)
                     .fillMaxSize()
             ) {
-                Balance(walletViewModel, budgetViewModel, configuration, onClick = {
-
-                    scope.launch {
-                        delay(500)
-                        thirdIsVisible.value = true
-                    }
-                })
+                Balance(
+                    walletViewModel,
+                    budgetViewModel,
+                    currencyManagerViewModel,
+                    configuration,
+                    onClick = {
+                        scope.launch {
+                            delay(500)
+                            thirdIsVisible.value = true
+                        }
+                    })
             }
 
             ExpenseDialog(isOpen = walletViewModel.isOpenDialog.value,

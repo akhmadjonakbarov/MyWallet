@@ -45,6 +45,7 @@ fun BudgetManager(
     expanses: List<ExpanseModel>,
     budgetViewModel: BudgetViewModel,
     walletViewModel: WalletViewModel,
+    currencyType: String,
     configuration: Configuration,
     openDialog: () -> Unit
 ) {
@@ -139,7 +140,7 @@ fun BudgetManager(
                             )
                         }
                         Text(
-                            "${NumberFormat.format(totalPrice)} so'm",
+                            "${NumberFormat.format(totalPrice)} ${currencyType.lowercase()}",
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 fontWeight = FontWeight.Bold, color = Color.Black
                             ),
@@ -150,7 +151,7 @@ fun BudgetManager(
                 when {
                     expanses.isNotEmpty() -> {
                         ExpanseList(
-                            expanses, configuration,
+                            expanses, configuration, currencyType,
                             onDelete = {
                                 walletViewModel.deleteExpanse(it)
                             },
