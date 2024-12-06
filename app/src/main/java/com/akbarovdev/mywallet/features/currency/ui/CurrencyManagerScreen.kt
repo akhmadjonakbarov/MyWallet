@@ -1,6 +1,7 @@
 package com.akbarovdev.mywallet.features.currency.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
@@ -35,15 +36,13 @@ fun CurrencyManagerScreen(
                         state.value.currencyTypes,
                         state.value.currency.name,
                         onSelect = {
-                            {
-                                viewModel.selectCurrency(it)
-                            }
+                            viewModel.selectCurrency(it)
                         }
                     )
                 }
 
-                else ->  {
-                    AlertTextBox("No Currency Type")
+                else -> {
+                    AlertTextBox("No Currency Type", modifier = Modifier.fillMaxSize())
                 }
             }
         }

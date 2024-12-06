@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -81,8 +82,10 @@ fun BudgetManager(
                 Modifier.height(15.dp)
             )
             ProgressBar(
-                budgetViewModel.state.value.percentage,
-                configuration
+                budgetViewModel.state.value.percentage, configuration
+            )
+            Spacer(
+                Modifier.height(15.dp)
             )
         }
         Box(
@@ -117,18 +120,15 @@ fun BudgetManager(
                             modifier = Modifier
 
                                 .clip(RoundedCornerShape(5.dp))
-                                .clickable(
-                                    onClick = {
-                                        showDateTimePickerDialog.value = true
-                                    }
-                                )
+                                .clickable(onClick = {
+                                    showDateTimePickerDialog.value = true
+                                })
                                 .padding(5.dp),
                         ) {
                             Text(
                                 text = "Expenses",
                                 style = MaterialTheme.typography.headlineSmall.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Black
+                                    fontWeight = FontWeight.Bold, color = Color.Black
                                 )
                             )
                             Text(
@@ -150,20 +150,16 @@ fun BudgetManager(
                 }
                 when {
                     expanses.isNotEmpty() -> {
-                        ExpanseList(
-                            expanses, configuration, currencyType,
-                            onDelete = {
-                                walletViewModel.deleteExpanse(it)
-                            },
-                            onLongPress = {
-                                walletViewModel.selectExpanse(it)
-                            }
-                        )
+                        ExpanseList(expanses, configuration, currencyType, onDelete = {
+                            walletViewModel.deleteExpanse(it)
+                        }, onLongPress = {
+                            walletViewModel.selectExpanse(it)
+                        })
                     }
 
                     else -> {
                         AlertTextBox(
-                            "Expanse does not exist"
+                            "Expanse does not exist", modifier = Modifier.fillMaxSize()
                         )
                     }
 
@@ -173,18 +169,16 @@ fun BudgetManager(
         }
     }
     if (showDateTimePickerDialog.value) {
-        DatePickerModal(
-            onDateSelected = { millis ->
-                if (millis != null) {
-                    val date = Instant.ofEpochMilli(millis)
-                        .atZone(ZoneId.systemDefault())  // or use a specific timezone
-                        .toLocalDateTime()
-                    walletViewModel.setDate(date)
-                }
-            }, onDismiss = {
-                showDateTimePickerDialog.value = false
+        DatePickerModal(onDateSelected = { millis ->
+            if (millis != null) {
+                val date = Instant.ofEpochMilli(millis)
+                    .atZone(ZoneId.systemDefault())  // or use a specific timezone
+                    .toLocalDateTime()
+                walletViewModel.setDate(date)
             }
-        )
+        }, onDismiss = {
+            showDateTimePickerDialog.value = false
+        })
     }
 }
 
@@ -192,27 +186,22 @@ fun BudgetManager(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerModal(
-    onDateSelected: (Long?) -> Unit,
-    onDismiss: () -> Unit
+    onDateSelected: (Long?) -> Unit, onDismiss: () -> Unit
 ) {
     val datePickerState = rememberDatePickerState()
 
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = {
-                onDateSelected(datePickerState.selectedDateMillis)
-                onDismiss()
-            }) {
-                Text("OK")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
+    DatePickerDialog(onDismissRequest = onDismiss, confirmButton = {
+        TextButton(onClick = {
+            onDateSelected(datePickerState.selectedDateMillis)
+            onDismiss()
+        }) {
+            Text("OK")
         }
-    ) {
+    }, dismissButton = {
+        TextButton(onClick = onDismiss) {
+            Text("Cancel")
+        }
+    }) {
         DatePicker(state = datePickerState)
     }
 }

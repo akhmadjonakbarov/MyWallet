@@ -1,5 +1,7 @@
 package com.akbarovdev.mywallet.features.currency.ui.components
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,13 +19,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.akbarovdev.mywallet.features.currency.domain.model.CurrencyModel
+import kotlinx.coroutines.delay
 
 
 @Composable
@@ -33,6 +38,15 @@ fun CurrencyTypeItem(
     onSelect: (CurrencyModel) -> Unit
 ) {
     val configuration = LocalConfiguration.current
+    val scale = animateFloatAsState(
+        targetValue = if (isSelected) 1f else 0.0f, animationSpec = tween(durationMillis = 1000),
+        label = "Currency Type Item Scale"
+    )
+
+    LaunchedEffect(Unit) {
+        delay(500)
+
+    }
     Box(
         modifier = Modifier
             .padding(bottom = 5.dp, end = 5.dp, start = 5.dp)
@@ -52,6 +66,9 @@ fun CurrencyTypeItem(
             if (isSelected) {
                 Icon(
                     modifier = Modifier
+                        .scale(
+                            scale = scale.value
+                        )
                         .clip(shape = CircleShape)
                         .background(color = Color.LightGray)
                         .padding(2.dp),

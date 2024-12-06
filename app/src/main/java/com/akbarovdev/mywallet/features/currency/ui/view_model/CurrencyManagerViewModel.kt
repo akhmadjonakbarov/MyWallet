@@ -1,21 +1,26 @@
 package com.akbarovdev.mywallet.features.currency.ui.view_model
 
 import android.content.Context
+import android.content.Intent
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.akbarovdev.mywallet.core.database.sharedPreferences
 import com.akbarovdev.mywallet.features.currency.domain.model.CurrencyModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.system.exitProcess
 
 @HiltViewModel
 class CurrencyManagerViewModel @Inject constructor(
-    @ApplicationContext context: Context
+    @ApplicationContext val context: Context
 ) : ViewModel() {
 
     data class CurrencyState(
@@ -35,7 +40,7 @@ class CurrencyManagerViewModel @Inject constructor(
         const val CURRENCY_TYPE = "currency_type"
     }
 
-    // Use the sharedPreferences delegate for username
+    // Use the sharedPreferences delegate for currency type
     var currency by context.sharedPreferences(CURRENCY_TYPE, defaultValue = "UZS")
 
 
@@ -85,9 +90,26 @@ class CurrencyManagerViewModel @Inject constructor(
 
     fun selectCurrency(newCurrency: CurrencyModel) {
         viewModelScope.launch {
-            currency = newCurrency.name
-            check()
-            fetchTypes()
+            try {
+                Log.i("Currency", "$newCurrency")
+                currency = newCurrency.name
+                fetchTypes()
+                check()
+            } catch (e: Exception) {
+                Log.e("Currency", "Error: $e")
+            }
+            Toast.makeText(context, "App will restart to change currency type", Toast.LENGTH_SHORT)
+                .show()
+            delay(1500)
+            restartApp()
         }
     }
+
+    fun restartApp() {
+        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+        intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
+        exitProcess(0) // Terminates the current process
+    }
+
 }

@@ -20,7 +20,7 @@ fun SettingScreen(
         navController = innerNavController, startDestination = SettingScreen.home
     ) {
         composable(SettingScreen.home) {
-            HomeScreen(navController)
+            HomeScreen(navController, innerNavController)
         }
         composable(SettingScreen.language) {
         }

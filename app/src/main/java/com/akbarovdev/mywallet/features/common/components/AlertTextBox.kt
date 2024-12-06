@@ -11,9 +11,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 
 @Composable
-fun AlertTextBox(title: String, textColor: Color = Color.Black) {
+fun AlertTextBox(title: String, textColor: Color = Color.Black, modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         contentAlignment = Alignment.Center // Centers the content in the Box
     ) {
         Text(

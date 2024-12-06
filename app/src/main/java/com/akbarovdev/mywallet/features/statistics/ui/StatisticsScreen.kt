@@ -2,9 +2,13 @@ package com.akbarovdev.mywallet.features.statistics.ui
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
@@ -18,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -87,18 +92,27 @@ fun StatisticsScreen(
                         }
 
                         else -> {
-                            AlertTextBox("Data is not enough for generating statistics!")
-
+                            AlertTextBox(
+                                "Data is not enough for generating statistics!",
+                                modifier = Modifier.fillMaxSize()
+                            )
                         }
                     }
                 }
 
                 else -> {
-                    Column {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = Color.White),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Image(
                             painter = painterResource(R.drawable.description),
                             contentDescription = ""
                         )
+                        Spacer(Modifier.height((configuration.screenHeightDp / 95).dp))
                         AlertTextBox("Statistics does not exist")
                     }
                 }

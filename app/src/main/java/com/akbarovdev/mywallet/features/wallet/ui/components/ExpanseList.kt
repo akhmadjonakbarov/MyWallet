@@ -54,7 +54,6 @@ fun ExpanseList(
 ) {
 
     LazyColumn {
-
         items(count = expanses.count()) { index ->
             val expanse: ExpanseModel = expanses[index]
             ExpanseItem(

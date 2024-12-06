@@ -17,7 +17,7 @@ import com.akbarovdev.mywallet.features.common.components.AppBar
 import com.akbarovdev.mywallet.features.settings.ui.components.SettingItem
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, innerNavController: NavController) {
     val configuration = LocalConfiguration.current
     Scaffold(topBar = {
         AppBar(navController = navController, title = "Settings")
@@ -33,7 +33,7 @@ fun HomeScreen(navController: NavController) {
             ) {
                 SettingItem("Language") {}
                 SettingItem("About App") {
-                    navController.navigate(SettingScreen.aboutapp)
+                    innerNavController.navigate(SettingScreen.aboutapp)
                 }
             }
         }

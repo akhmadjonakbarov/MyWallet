@@ -2,7 +2,6 @@ package com.akbarovdev.mywallet.features.currency.ui.components
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import com.akbarovdev.mywallet.features.currency.domain.model.CurrencyModel
 
 @Composable

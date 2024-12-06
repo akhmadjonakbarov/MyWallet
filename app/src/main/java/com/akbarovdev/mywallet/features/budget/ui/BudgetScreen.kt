@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,17 +36,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.akbarovdev.mywallet.R
 import com.akbarovdev.mywallet.features.budget.domain.models.BudgetModel
 import com.akbarovdev.mywallet.features.budget.ui.view_model.BudgetViewModel
 import com.akbarovdev.mywallet.features.common.components.AlertTextBox
 import com.akbarovdev.mywallet.features.common.components.AppBar
+import com.akbarovdev.mywallet.features.currency.ui.view_model.CurrencyManagerViewModel
 import com.akbarovdev.mywallet.utils.DateFormatter
 import com.akbarovdev.mywallet.utils.NumberFormat
 import kotlinx.coroutines.launch
@@ -59,10 +57,12 @@ import java.time.LocalDateTime
 @Composable
 fun BudgetScreen(
     navController: NavController,
-    budgetViewModel: BudgetViewModel = hiltViewModel<BudgetViewModel>()
+    budgetViewModel: BudgetViewModel = hiltViewModel<BudgetViewModel>(),
+    currencyManagerViewModel: CurrencyManagerViewModel = hiltViewModel<CurrencyManagerViewModel>()
 ) {
 
     val state = budgetViewModel.state.collectAsState()
+    val currencyState = currencyManagerViewModel.state.collectAsState()
     val budget = remember { mutableStateOf(BudgetModel.empty()) }
     Scaffold(topBar = {
         AppBar(
@@ -91,14 +91,15 @@ fun BudgetScreen(
                                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.W700)
                                 )
                                 Text(
-                                    "${NumberFormat.format(totalBudgets)} so'm",
+                                    "${NumberFormat.format(totalBudgets)} ${currencyState.value.currency.name}",
                                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.W700)
                                 )
                             }
                         }
                         items(state.value.list.size) { index ->
                             val item = state.value.list[index]
-                            BudgetItem(item, onDelete = {
+                            val currencyType = currencyState.value.currency.name
+                            BudgetItem(item, currencyType, onDelete = {
                                 budget.value = item
                                 budgetViewModel.openDialog()
                             })
@@ -107,7 +108,7 @@ fun BudgetScreen(
                 }
 
                 else -> {
-                    AlertTextBox("No budgets")
+                    AlertTextBox("No budgets", modifier = Modifier.fillMaxSize())
                 }
             }
         }
@@ -117,7 +118,7 @@ fun BudgetScreen(
         AlertDialog(
             title = {
                 Text(
-                    "${NumberFormat.format(budget.value.amount)} so'm",
+                    "${NumberFormat.format(budget.value.amount)} ${currencyState.value.currency.name}",
                 )
             },
             text = {
@@ -153,7 +154,7 @@ fun BudgetScreen(
 @SuppressLint("NewApi")
 @Composable
 private fun BudgetItem(
-    budget: BudgetModel, padding: Dp = 20.dp, onDelete: () -> Unit
+    budget: BudgetModel, currencyType: String, padding: Dp = 20.dp, onDelete: () -> Unit
 ) {
     // State for alpha animation
     val alphaAnimation = remember { Animatable(0f) }
@@ -201,7 +202,7 @@ private fun BudgetItem(
                 )
             }
             Text(
-                "${NumberFormat.format(budget.amount)} so'm",
+                "${NumberFormat.format(budget.amount)} $currencyType",
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.W700)
             )
         }
