@@ -1,6 +1,8 @@
 package com.akbarovdev.mywallet.features.statistics.ui
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,14 +15,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,11 +37,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.akbarovdev.mywallet.R
 import com.akbarovdev.mywallet.features.common.components.AlertTextBox
+import com.akbarovdev.mywallet.features.common.components.AlertTextBoxAnimation
 import com.akbarovdev.mywallet.features.common.components.AppBar
 import com.akbarovdev.mywallet.features.currency.ui.view_model.CurrencyManagerViewModel
 import com.akbarovdev.mywallet.features.statistics.ui.components.BarChart
 import com.akbarovdev.mywallet.features.statistics.ui.components.ListBox
 import com.akbarovdev.mywallet.features.statistics.ui.view_model.StatisticViewModel
+import kotlinx.coroutines.delay
 
 
 @SuppressLint("NewApi")
@@ -47,6 +58,14 @@ fun StatisticsScreen(
     val configuration = LocalConfiguration.current
     val state = statisticViewModel.state.collectAsState()
     val currencyState = currencyManagerViewModel.state.collectAsState()
+    val isNotEnough = remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (state.value.charts.size <= 2) {
+            delay(200)
+            isNotEnough.value = true
+        }
+
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -76,6 +95,7 @@ fun StatisticsScreen(
                                     BarChart(
                                         charts = state.value.charts,
                                         height = (configuration.screenHeightDp * 0.3),
+                                        currencyType = currencyState.value.currency.name,
                                     )
                                 }
                                 items(state.value.statistics.count()) { index ->
@@ -92,10 +112,26 @@ fun StatisticsScreen(
                         }
 
                         else -> {
-                            AlertTextBox(
-                                "Data is not enough for generating statistics!",
-                                modifier = Modifier.fillMaxSize()
+                            val scale = animateFloatAsState(
+                                targetValue = if (isNotEnough.value) 1f else 0f,
+                                animationSpec = tween(durationMillis = 1500), label = ""
                             )
+                            AlertTextBoxAnimation(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        color = Color.White
+                                    )
+                            ) {
+                                Text(
+                                    modifier = Modifier.scale(scale.value),
+                                    text = "Data is not enough for generating statistics!",
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.headlineSmall.copy(
+                                        color = Color.Black
+                                    )
+                                )
+                            }
                         }
                     }
                 }
@@ -110,7 +146,7 @@ fun StatisticsScreen(
                     ) {
                         Image(
                             painter = painterResource(R.drawable.description),
-                            contentDescription = ""
+                            contentDescription = "",
                         )
                         Spacer(Modifier.height((configuration.screenHeightDp / 95).dp))
                         AlertTextBox("Statistics does not exist")

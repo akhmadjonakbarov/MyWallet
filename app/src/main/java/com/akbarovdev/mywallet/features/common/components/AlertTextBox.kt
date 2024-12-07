@@ -13,8 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 @Composable
 fun AlertTextBox(title: String, textColor: Color = Color.Black, modifier: Modifier = Modifier) {
     Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center // Centers the content in the Box
+        modifier = modifier, contentAlignment = Alignment.Center // Centers the content in the Box
     ) {
         Text(
             title,
@@ -23,5 +22,14 @@ fun AlertTextBox(title: String, textColor: Color = Color.Black, modifier: Modifi
                 color = textColor
             )
         )
+    }
+}
+
+@Composable
+fun AlertTextBoxAnimation(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Box(
+        modifier = modifier, contentAlignment = Alignment.Center // Centers the content in the Box
+    ) {
+        content()
     }
 }

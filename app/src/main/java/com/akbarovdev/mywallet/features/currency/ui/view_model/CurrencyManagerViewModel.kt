@@ -91,15 +91,12 @@ class CurrencyManagerViewModel @Inject constructor(
     fun selectCurrency(newCurrency: CurrencyModel) {
         viewModelScope.launch {
             try {
-                Log.i("Currency", "$newCurrency")
                 currency = newCurrency.name
                 fetchTypes()
                 check()
             } catch (e: Exception) {
                 Log.e("Currency", "Error: $e")
             }
-            Toast.makeText(context, "App will restart to change currency type", Toast.LENGTH_SHORT)
-                .show()
             delay(1500)
             restartApp()
         }

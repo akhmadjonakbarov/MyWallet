@@ -75,7 +75,7 @@ fun CurrencyTypeItem(
 
                     imageVector = Icons.Default.Check,
                     contentDescription = "",
-                    tint = Color.Green
+                    tint = Color.Red
                 )
             }
 

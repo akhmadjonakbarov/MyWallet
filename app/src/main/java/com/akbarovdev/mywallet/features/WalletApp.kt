@@ -43,7 +43,7 @@ fun WalletApp() {
             BudgetScreen(navController)
         }
         composable(Screens.currencyManager) {
-            CurrencyManagerScreen(navController)
+            CurrencyManagerScreen(navController, snackBarManager)
         }
         composable(SettingScreen.home) {
             SettingScreen(navController)

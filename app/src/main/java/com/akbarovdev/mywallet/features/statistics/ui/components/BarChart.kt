@@ -29,10 +29,10 @@ import com.akbarovdev.mywallet.utils.NumberFormat
 import java.time.LocalDateTime
 import kotlin.random.Random
 
-@SuppressLint("NewApi")
+@SuppressLint("NewApi", "MutableCollectionMutableState")
 @Composable
 fun BarChart(
-    charts: List<DailyExpanseChartModel>, height: Double,
+    charts: List<DailyExpanseChartModel>, height: Double, currencyType: String,
 ) {
 
 
@@ -74,7 +74,7 @@ fun BarChart(
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(DateFormatter.format(LocalDateTime.parse(charts.first().date)))
             Text(
-                "SO'M",
+                currencyType.uppercase(),
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
             )
         }
