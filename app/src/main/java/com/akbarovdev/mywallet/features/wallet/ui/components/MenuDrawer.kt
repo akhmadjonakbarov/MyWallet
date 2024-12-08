@@ -12,6 +12,9 @@ import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.CurrencyExchange
 import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.AttachMoney
+import androidx.compose.material.icons.outlined.MoneyOff
+import androidx.compose.material.icons.outlined.NoteAlt
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,9 +33,7 @@ import com.akbarovdev.mywallet.core.navigation.SettingScreen
 
 @Composable
 fun MenuDrawer(
-    configuration: Configuration,
-    navController: NavController,
-    onDismiss: () -> Unit
+    configuration: Configuration, navController: NavController, onDismiss: () -> Unit
 ) {
     ModalDrawerSheet(
         modifier = Modifier
@@ -63,17 +64,19 @@ fun MenuDrawer(
             navController.navigate(Screens.currencyManager)
             onDismiss()
         })
-        NavigationDrawerItem(
-            shape = RectangleShape,
-            label = {
-                MenuItemText("Settings", Icons.Default.Settings)
-            },
-            selected = false,
-            onClick = {
-                navController.navigate(SettingScreen.home)
-                onDismiss()
-            }
-        )
+        NavigationDrawerItem(shape = RectangleShape, label = {
+            MenuItemText("Debt Manager", Icons.Outlined.NoteAlt)
+        }, selected = false, onClick = {
+            navController.navigate(Screens.person)
+            onDismiss()
+        })
+        NavigationDrawerItem(shape = RectangleShape, label = {
+            MenuItemText("Settings", Icons.Default.Settings)
+        }, selected = false, onClick = {
+            navController.navigate(SettingScreen.home)
+            onDismiss()
+        })
+
     }
 }
 

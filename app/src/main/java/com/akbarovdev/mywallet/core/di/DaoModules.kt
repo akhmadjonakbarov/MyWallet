@@ -2,6 +2,8 @@ package com.akbarovdev.mywallet.core.di
 
 import com.akbarovdev.mywallet.core.database.WalletDatabase
 import com.akbarovdev.mywallet.features.budget.data.local.BudgetDao
+import com.akbarovdev.mywallet.features.debt.data.local.DebtDao
+import com.akbarovdev.mywallet.features.debt.data.local.PersonDao
 import com.akbarovdev.mywallet.features.wallet.data.local.ExpanseDao
 import dagger.Module
 import dagger.Provides
@@ -22,6 +24,18 @@ object DaoModules {
     @Singleton
     fun provideBudgetDao(db: WalletDatabase): BudgetDao {
         return db.budgetDao()
+    }
+
+    @Provides
+    @Singleton
+    fun providePersonDao(db: WalletDatabase): PersonDao {
+        return db.personDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideTransactionDao(db: WalletDatabase): DebtDao {
+        return db.debtDao()
     }
 
 

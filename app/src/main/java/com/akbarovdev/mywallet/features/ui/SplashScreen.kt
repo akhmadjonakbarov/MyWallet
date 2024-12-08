@@ -1,4 +1,4 @@
-package com.akbarovdev.mywallet.features.splash.ui
+package com.akbarovdev.mywallet.features.ui
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateDpAsState
@@ -97,11 +97,17 @@ fun SplashScreen(
         animationSpec = tween(durationMillis = (animationDuration + 700))
     )
 
+    fun navigateWalletScreen() {
+        navController.navigate(Screens.wallet) {
+            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+        }
+    }
+
     fun submit() {
         keyboardController?.hide()
         if (username.value.isEmpty()) {
             snackBarManager.showSnackBar(
-                "Please enter your username", isAlert = true
+                "Please enter your name!", isAlert = true
             )
             return
         }
@@ -110,19 +116,18 @@ fun SplashScreen(
             "Your account has been created successfully"
         )
         scope.launch {
-            delay(2000)
-            navController.navigate(Screens.wallet)
+            delay(1500)
+            navigateWalletScreen()
         }
     }
+
+
 
     LaunchedEffect(Unit) {
 
         if (state.value.username.isNotEmpty()) {
             delay(3000)
-            navController.navigate(Screens.wallet) {
-                popUpTo(navController.graph.startDestinationId) { inclusive = true }
-            }
-
+            navigateWalletScreen()
         }
     }
 
@@ -174,10 +179,9 @@ fun SplashScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-//                Image(painter = painterResource(), contentDescription = "")
                 if (state.value.username.isNotEmpty()) {
                     Text(
-                        "Salom ${state.value.username}",
+                        "Hello ${state.value.username}",
                         style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.Bold
                         )
@@ -201,13 +205,14 @@ fun SplashScreen(
                 if (state.value.username.isEmpty()) {
                     TextField(value = username.value, onValueChange = {
                         username.value = it
-                    }, label = {
-                        Text("Enter the username")
+                    }, placeholder = {
+                        Text("Enter the name")
                     }, modifier = Modifier.border(
                         width = 1.dp, color = Color.LightGray, shape = RoundedCornerShape(15)
                     ), colors = TextFieldDefaults.textFieldColors(
                         focusedIndicatorColor = Color.Transparent, // Removes the underline when focused
-                        unfocusedIndicatorColor = Color.Transparent // Removes the underline when unfocused
+                        unfocusedIndicatorColor = Color.Transparent,
+                        containerColor = Color.Transparent
                     )
                     )
                     Spacer(
@@ -236,12 +241,6 @@ fun SplashScreen(
 @Preview
 @Composable
 fun SplashScreenPreview() {
-//    val scope = rememberCoroutineScope()
-//    val snackBarHostState = remember { SnackbarHostState() }
-//    val snackBarManager = remember { SnackBarManager(snackBarHostState, scope) }
-//    SplashScreen(
-//        rememberNavController(), snackBarManager
-//    )
 
 
     Scaffold { contentPadding ->

@@ -53,21 +53,20 @@ class StatisticViewModel @Inject constructor(
                 val mostExpansiveExpanses = getMostExpensive()
                 val statistics = listOf(
                     StatisticModel(
-                        label = "Most Bought", list = mostBoughtExpanses
-                    ), StatisticModel(
+                        label = "Most Bought",
+                        list = mostBoughtExpanses
+                    ),
+                    StatisticModel(
                         label = "Most Expansive",
                         list = mostExpansiveExpanses
                     )
                 )
 
-                Log.d("ViewModel", "Statistics populated: ${statistics.size}")
-
                 _state.update {
                     it.copy(
                         charts = charts,
                         statistics = statistics,
-
-                        )
+                    )
                 }
             } catch (e: Exception) {
                 _state.update { it.copy(error = "Failed to fetch expenses: ${e.message}") }

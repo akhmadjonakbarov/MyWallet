@@ -41,16 +41,18 @@ data class ExpanseModel(
         return id.hashCode() * 31 + title.hashCode()
     }
 
-    fun empty(): ExpanseModel {
-        return ExpanseModel(
-            id = -1,
-            title = "",
-            price = 0.0,
-            qty = 0.0,
-            date = "",
-            icon = "",
-            measure = "",
-            budgetId = -1
-        )
+    companion object {
+        fun empty(): ExpanseModel {
+            return ExpanseModel(
+                id = -1,
+                title = "",
+                price = 0.0,
+                qty = 0.0,
+                date = "",
+                icon = "",
+                measure = "",
+                budgetId = -1
+            )
+        }
     }
 }

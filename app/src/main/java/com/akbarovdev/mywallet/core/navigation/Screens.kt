@@ -6,4 +6,6 @@ object Screens {
     const val currencyManager = "currencyManager"
     const val budget = "budget"
     const val splash = "splash"
+    const val person = "person"
+    const val personDetail = "person/{personJson}"
 }

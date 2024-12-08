@@ -64,7 +64,6 @@ fun StatisticsScreen(
             delay(200)
             isNotEnough.value = true
         }
-
     }
 
     Scaffold(

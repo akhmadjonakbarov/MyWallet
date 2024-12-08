@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     kotlin("kapt")  // Apply Kotlin Kapt plugin
     id("com.google.dagger.hilt.android")
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 android {
@@ -96,6 +97,9 @@ dependencies {
     // Navigation
     val nav_version = "2.8.4"
     implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    // Serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 }
 
 kapt {
