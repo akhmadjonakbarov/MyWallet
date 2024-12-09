@@ -19,6 +19,7 @@ class PersonViewModel @Inject constructor(
 ) : ViewModel() {
     data class PersonState(
         val persons: List<PersonModel> = emptyList(),
+        val selectedPerson: PersonModel = PersonModel.empty(),
         val isLoading: Boolean = false,
         val error: String? = null,
     )
@@ -45,34 +46,73 @@ class PersonViewModel @Inject constructor(
             } catch (e: Exception) {
                 _state.update {
                     it.copy(
-                        error = "Failed to load persons: ${e.message}",
-                        isLoading = false
+                        error = "Failed to load persons: ${e.message}", isLoading = false
                     )
                 }
             }
         }
     }
 
+
     fun add(person: PersonModel) {
         viewModelScope.launch {
             try {
                 personRepository.add(person)
-                getAll()
+                getAll() // Refresh the list after adding
             } catch (e: Exception) {
                 _state.update { it.copy(error = "Failed to add person: ${e.message}") }
             } finally {
-                closeDialog()
+                closeDialog() // Close dialog after operation
             }
+        }
+    }
+
+    fun update(person: PersonModel) {
+        viewModelScope.launch {
+            try {
+                val updatedPerson = person.copy(
+                    id = _state.value.selectedPerson.id
+                )
+                personRepository.add(updatedPerson)
+                getAll() // Refresh the list after updating
+            } catch (e: Exception) {
+                _state.update { it.copy(error = "Failed to update person: ${e.message}") }
+            } finally {
+                closeDialog() // Close dialog after operation
+                selectPerson()
+            }
+        }
+    }
+
+    fun delete(person: PersonModel) {
+        viewModelScope.launch {
+            try {
+                personRepository.delete(person)
+                getAll() // Refresh the list after deletion
+            } catch (e: Exception) {
+                _state.update { it.copy(error = "Failed to delete person: ${e.message}") }
+            } finally {
+                selectPerson()
+            }
+        }
+    }
+
+    fun selectPerson(person: PersonModel = PersonModel.empty(), openDialog: (() -> Unit)? = null) {
+        viewModelScope.launch {
+            _state.update { it.copy(selectedPerson = person) }
+            openDialog?.invoke()
         }
     }
 
 
     fun openDialog() {
         _isOpenDialog.value = true
+
     }
 
     fun closeDialog() {
         _isOpenDialog.value = false
+        selectPerson()
     }
 
     fun searchByName(string: String) {

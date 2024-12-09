@@ -142,7 +142,12 @@ fun SplashScreen(
 
 
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(), snackbarHost =  {
+            AppSnackBarHostState(
+                snackBarHostState = snackBarManager.snackBarHostState,
+                snackBarColor = snackBarManager.snackBarColor,
+            )
+        }
     ) { contentPadding ->
         Box(
             modifier = Modifier
@@ -231,10 +236,7 @@ fun SplashScreen(
             }
         }
     }
-    AppSnackBarHostState(
-        snackBarHostState = snackBarManager.snackBarHostState,
-        snackBarColor = snackBarManager.snackBarColor,
-    )
+
 }
 
 

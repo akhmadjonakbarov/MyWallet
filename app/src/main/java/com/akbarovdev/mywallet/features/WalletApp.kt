@@ -36,12 +36,10 @@ fun WalletApp() {
         startDestination = Screens.splash
     ) {
         composable(Screens.splash) {
-            SplashScreen(
-                navController, snackBarManager
-            )
+            SplashScreen(navController, snackBarManager)
         }
         composable(Screens.wallet) {
-            WalletScreen(navController)
+            WalletScreen(navController, snackBarManager)
         }
         composable(Screens.statistics) {
             StatisticsScreen(navController)
@@ -53,7 +51,7 @@ fun WalletApp() {
             CurrencyManagerScreen(navController, snackBarManager)
         }
         composable(SettingScreen.home) {
-            SettingScreen(navController)
+            SettingScreen(navController, snackBarManager)
         }
         composable(Screens.person) {
             PersonScreen(navController, snackBarManager) { person ->

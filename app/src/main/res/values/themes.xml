@@ -3,7 +3,7 @@
 
     <style name="Theme.MyWallet" parent="android:Theme.Material.Light.NoActionBar">
         <!-- Ensure no splash screen is set -->
-        <item name="android:windowBackground">@android:color/white
-        </item> <!-- Pure white or any solid color -->
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:background">@color/transparent</item>
     </style>
 </resources>

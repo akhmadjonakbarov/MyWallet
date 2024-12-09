@@ -179,7 +179,7 @@ private fun BudgetItem(
     Box(modifier = Modifier
         .fillMaxWidth()
         .pointerInput(Unit) {
-            detectTapGestures(onTap = { onDelete() })
+            detectTapGestures(onDoubleTap = { onDelete() })
         }
         .graphicsLayer {
             alpha = alphaAnimation.value

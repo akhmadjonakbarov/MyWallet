@@ -54,7 +54,7 @@ class DebtViewModel @Inject constructor(
             repository.getAll().collect { debts ->
 
                 val debts = debts.filter {
-                    it.id == _person.value.id
+                    it.personId == _person.value.id
                 }
                 val total = debts.filter {
                     it.isPaid == false
@@ -64,7 +64,6 @@ class DebtViewModel @Inject constructor(
                         debts = debts, isLoading = false, total = total
                     )
                 }
-
             }
         }
     }
@@ -122,6 +121,7 @@ class DebtViewModel @Inject constructor(
                 val updatedDebt = debt.copy(
                     personId = _person.value.id
                 )
+
                 repository.add(updatedDebt)
             } catch (e: Exception) {
                 _state.update {

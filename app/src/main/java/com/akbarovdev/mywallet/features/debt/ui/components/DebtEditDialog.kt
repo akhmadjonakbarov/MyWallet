@@ -66,8 +66,10 @@ fun DebtEditDialog(
                             amount = it
                             amountError = if (it.isEmpty()) "Amount cannot be empty" else null
                         },
+                        maxLines = 1,
                         placeholder = { Text("Amount") },
-                        isError = amountError != null
+                        isError = amountError != null,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     )
                     if (amountError != null) {
                         Text(
@@ -86,7 +88,6 @@ fun DebtEditDialog(
 
                         },
                         placeholder = { Text("Description") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 
                         )
                     Spacer(modifier = Modifier.height(8.dp))

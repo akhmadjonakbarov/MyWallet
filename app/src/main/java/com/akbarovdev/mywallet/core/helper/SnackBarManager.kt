@@ -9,15 +9,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class SnackBarManager(
-    val snackBarHostState: SnackbarHostState,
-    private val scope: CoroutineScope
+    val snackBarHostState: SnackbarHostState, val scope: CoroutineScope
 ) {
     var snackBarColor by mutableStateOf(Color.DarkGray)
-    fun showSnackBar(message: String, isAlert: Boolean = false) {
+    fun showSnackBar(message: String, isAlert: Boolean = false, reset: (() -> Unit)? = null) {
         snackBarColor = if (isAlert) Color.Red else Color.DarkGray
         snackBarHostState.currentSnackbarData?.dismiss()
         scope.launch {
             snackBarHostState.showSnackbar(message)
         }
+        reset?.invoke()
     }
 }

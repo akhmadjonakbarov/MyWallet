@@ -28,21 +28,20 @@ fun PersonEditDialog(
     isOpen: Boolean,
     onDismiss: () -> Unit,
     onSave: (PersonModel) -> Unit,
-    personModel: PersonModel? = null
+    personModel: PersonModel
 ) {
 
 
     var nameError by remember { mutableStateOf<String?>(null) }
     var phoneNumberError by remember { mutableStateOf<String?>(null) }
-
-
+    var isPersonEmpty by remember { mutableStateOf<Boolean>(personModel.id == -1) }
 
     if (isOpen) {
         var name by remember { mutableStateOf("") }
         var phoneNumber by remember { mutableStateOf("") }
 
 
-        if (personModel != null) {
+        if (!isPersonEmpty) {
             name = personModel.name
             phoneNumber = personModel.phoneNumber
         }
@@ -63,7 +62,7 @@ fun PersonEditDialog(
         AlertDialog(
             onDismissRequest = onDismiss,
             title = {
-                Text(text = if (false) "Edit Person" else "Add Person")
+                Text(text = if (!isPersonEmpty) "Edit Person" else "Add Person")
             },
             text = {
                 Column {
@@ -98,7 +97,7 @@ fun PersonEditDialog(
                             }
                         },
                         placeholder = { Text("+998 90 123 45 67") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         isError = phoneNumberError != null
                     )
                     if (phoneNumberError != null) {

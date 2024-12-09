@@ -12,16 +12,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.akbarovdev.mywallet.core.helper.SnackBarManager
 import com.akbarovdev.mywallet.core.navigation.SettingScreen
 import com.akbarovdev.mywallet.features.common.components.AppBar
 import com.akbarovdev.mywallet.features.settings.ui.components.SettingItem
+import com.akbarovdev.mywallet.features.wallet.ui.components.AppSnackBarHostState
+
 
 @Composable
-fun HomeScreen(navController: NavController, innerNavController: NavController) {
+fun HomeScreen(
+    navController: NavController,
+    innerNavController: NavController,
+    snackBarManager: SnackBarManager
+) {
     val configuration = LocalConfiguration.current
-    Scaffold(topBar = {
-        AppBar(navController = navController, title = "Settings")
-    }) { contentPadding ->
+    Scaffold(
+        topBar = {
+            AppBar(navController = navController, title = "Settings")
+        },
+        snackbarHost = {
+            AppSnackBarHostState(
+                snackBarManager.snackBarHostState, snackBarManager.snackBarColor
+            )
+        }
+    ) { contentPadding ->
         Box(
             modifier = Modifier
                 .padding(contentPadding)
@@ -31,7 +45,11 @@ fun HomeScreen(navController: NavController, innerNavController: NavController) 
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
-                SettingItem("Language") {}
+                SettingItem("Language") {
+                    snackBarManager.showSnackBar(
+                        "Only English language available!", isAlert = true
+                    )
+                }
                 SettingItem("About App") {
                     innerNavController.navigate(SettingScreen.aboutapp)
                 }

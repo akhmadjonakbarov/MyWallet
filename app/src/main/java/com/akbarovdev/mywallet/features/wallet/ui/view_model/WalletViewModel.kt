@@ -50,6 +50,10 @@ class WalletViewModel @Inject constructor(
     private val _state = MutableStateFlow(ExpanseState())
     val state: StateFlow<ExpanseState> = _state.asStateFlow()
 
+    init {
+        fetchExpanses()
+    }
+
 
     fun addExpanse(expanse: ExpanseModel, onUpdate: (() -> Unit)? = null) {
         viewModelScope.launch {
@@ -192,5 +196,12 @@ class WalletViewModel @Inject constructor(
         fetchExpanses()
     }
 
+    fun resetState() {
+        _state.update {
+            it.copy(
+                isDeleted = false
+            )
+        }
+    }
 
 }

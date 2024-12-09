@@ -20,9 +20,22 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {
+        create("release") {
+            storeFile = file("C:/Users/Akhmad/Desktop/Keys/walletappkeystore.jks")
+            storePassword = "kechir"
+            keyAlias = "mywalletalies"
+            keyPassword = "kechir"
+        }
+    }
 
     buildTypes {
+        debug {
+            // You can configure debug-specific settings here
+            isMinifyEnabled = false
+        }
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -30,6 +43,7 @@ android {
             )
         }
     }
+    
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11

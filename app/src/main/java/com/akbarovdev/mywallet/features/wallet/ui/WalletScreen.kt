@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.akbarovdev.mywallet.core.helper.SnackBarManager
 import com.akbarovdev.mywallet.features.budget.ui.view_model.BudgetViewModel
 import com.akbarovdev.mywallet.features.common.components.HomeAppBar
 import com.akbarovdev.mywallet.features.currency.ui.view_model.CurrencyManagerViewModel
@@ -34,6 +35,7 @@ import com.akbarovdev.mywallet.features.wallet.ui.components.ExpenseDialog
 import com.akbarovdev.mywallet.features.wallet.ui.components.FloatButton
 import com.akbarovdev.mywallet.features.wallet.ui.components.MenuDrawer
 import com.akbarovdev.mywallet.features.wallet.ui.view_model.WalletViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -42,13 +44,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun WalletScreen(
     navController: NavController,
+    snackBarManager: SnackBarManager,
+    scope: CoroutineScope = rememberCoroutineScope(),
     walletViewModel: WalletViewModel = hiltViewModel<WalletViewModel>(),
     budgetViewModel: BudgetViewModel = hiltViewModel<BudgetViewModel>(),
     currencyManagerViewModel: CurrencyManagerViewModel = hiltViewModel<CurrencyManagerViewModel>()
 ) {
     val configuration = LocalConfiguration.current
-    val scope = rememberCoroutineScope()
-    val snackBarHostState = remember { SnackbarHostState() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     val walletState = walletViewModel.state.collectAsState()
@@ -63,22 +65,24 @@ fun WalletScreen(
     )
 
     LaunchedEffect(Unit) {
-        walletViewModel.fetchExpanses()
+
         budgetViewModel.fetchBudget(onUpdate = {
             scope.launch {
                 thirdIsVisible.value = true
             }
         })
 
-        if (walletState.value.isDeleted) {
-            scope.launch {
-                snackBarHostState.showSnackbar(
-                    message = "Expanse was deleted successfully"
-                )
-            }
 
+    }
+
+    LaunchedEffect(walletState.value.isDeleted) {
+        if (walletState.value.isDeleted) {
+            snackBarManager.showSnackBar("Expense was deleted successfully") {
+                walletViewModel.resetState()
+            }
         }
     }
+
 
     fun closeDrawer() {
         scope.launch {
@@ -98,6 +102,11 @@ fun WalletScreen(
                     drawerState.open()  // Open drawer when navigation icon is clicked
                 }
             }
+        }, snackbarHost = {
+            AppSnackBarHostState(
+                snackBarHostState = snackBarManager.snackBarHostState,
+                snackBarColor = snackBarManager.snackBarColor,
+            )
         },
 
             floatingActionButton = {
@@ -148,23 +157,13 @@ fun WalletScreen(
                         walletViewModel.addExpanse(expense) {
                             budgetViewModel.fetchBudget()
                         }
-                        scope.launch {
-                            snackBarHostState.showSnackbar("Expanses has been added")
-                        }
+                        snackBarManager.showSnackBar("Expanses has been added")
                     }
                 }
             )
 
         }
-        AppSnackBarHostState(
-            snackBarHostState = snackBarHostState,
-        )
+
     }
 }
 
-
-@Preview
-@Composable
-fun WalletScreenPreview() {
-    WalletScreen(rememberNavController())
-}
