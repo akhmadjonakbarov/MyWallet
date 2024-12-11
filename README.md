@@ -1,4 +1,4 @@
-# Wallet App
+# ![App Logo](images/logo.png) Wallet App
 
 A simple yet powerful wallet app to help you manage your finances, track your expenses, set budgets, visualize your spending, and manage your debts.
 
@@ -39,7 +39,9 @@ A simple yet powerful wallet app to help you manage your finances, track your ex
 
 ## Screenshots
 
-(Add screenshots here of the app's user interface for better clarity.)
+### Example of the app interface:
+![App Screenshot 1](images/photo_2024-12-10_03-30-09.jpg)
+![App Screenshot 2](images/photo_2024-12-10_03-30-11.jpg)
 
 ## Future Enhancements
 
